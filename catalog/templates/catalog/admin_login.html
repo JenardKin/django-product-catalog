@@ -1,0 +1,21 @@
+{% extends "admin/login.html" %}
+
+{% block extrastyle %}{{ block.super }}
+<style>
+  .view-site-link { clear: both; padding-top: 1.5rem; text-align: center; }
+  .view-site-link a.button {
+    display: inline-block;
+    padding: 10px 15px;
+    margin: 2px 0;
+    vertical-align: middle;
+    font-size: 0.8125rem;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+{{ block.super }}
+<div class="view-site-link">
+  <a class="button" href="{% url 'product_search' %}">View Site</a>
+</div>
+{% endblock %}

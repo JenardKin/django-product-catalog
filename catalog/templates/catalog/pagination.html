@@ -1,0 +1,29 @@
+{% if page.has_other_pages %}
+  <nav class="pagination {{ position }}" aria-label="Pagination ({{ position }})">
+    {% if page.has_previous %}
+      {% include "catalog/page_link.html" with number=1 label="First" title="First page" %}
+      {% include "catalog/page_link.html" with number=page.previous_page_number label="Previous" title="Previous page" %}
+    {% else %}
+      <span class="disabled">First</span>
+      <span class="disabled">Previous</span>
+    {% endif %}
+
+    {% for item in page_range %}
+      {% if item == ellipsis %}
+        <span class="gap">{{ ellipsis }}</span>
+      {% elif item == page.number %}
+        <span class="current" aria-current="page">{{ item }}</span>
+      {% else %}
+        {% include "catalog/page_link.html" with number=item label=item title="" %}
+      {% endif %}
+    {% endfor %}
+
+    {% if page.has_next %}
+      {% include "catalog/page_link.html" with number=page.next_page_number label="Next" title="Next page" %}
+      {% include "catalog/page_link.html" with number=page.paginator.num_pages label="Last" title="Last page" %}
+    {% else %}
+      <span class="disabled">Next</span>
+      <span class="disabled">Last</span>
+    {% endif %}
+  </nav>
+{% endif %}

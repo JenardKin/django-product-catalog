@@ -1,0 +1,148 @@
+{% load django_htmx static %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Product Catalog</title>
+  <!-- Setup HTMX and JQuery -->
+  <script src="{% static 'catalog/js/htmx.min.js' %}"></script>
+  {% django_htmx_script %}
+  <script src="{% static 'admin/js/vendor/jquery/jquery.min.js' %}"></script>
+  {{ form.media }}
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 70rem; margin: 1rem auto; padding: 0 1rem; color: #333; }
+    .messages { list-style: none; margin: 0 0 1rem; padding: 0; }
+    .messages li { padding: 0.6rem 0.9rem; border-radius: 4px; margin-bottom: 0.5rem; background: #e8f0f4; border: 1px solid #b9cdd6; }
+    .messages li.success { background: #e6f4ea; border-color: #b7dcc1; }
+    .messages li.error { background: #fdecea; border-color: #f2b8b5; }
+    .topbar { display: flex; justify-content: space-between; align-items: center; gap: 1rem; margin-bottom: 1rem; }
+    .topbar h1 { margin: 0; }
+    .account { display: flex; align-items: center; gap: 0.75rem; font-size: 0.9rem; }
+    .account form { margin: 0; }
+    .account .who { color: #555; }
+    .account button, .account a.button { padding: 0.4rem 0.9rem; font-size: 0.9rem; cursor: pointer; border: 1px solid #767676; border-radius: 3px; background: #efefef; color: #000; text-decoration: none; }
+    .muted { color: #666; font-size: 0.9rem; }
+    .htmx-request { opacity: 0.6; }
+
+    /* Search bar across the top */
+    .searchbar { display: flex; align-items: center; margin-bottom: 1rem; }
+    .searchbar input[type=text] { flex: 1; min-width: 0; padding: 0.5rem; font-size: 1rem; border: 1px solid #ccc; border-radius: 4px; }
+    .searchbar .sort { margin-left: 0.5rem; white-space: nowrap; color: #666; font-size: 0.9rem; }
+    .searchbar .sort select { margin-left: 0.25rem; padding: 0.5rem; font-size: 1rem; }
+    .searchbar .clear-all { margin-left: 0.5rem; padding: 0.5rem 1rem; font-size: 1rem; white-space: nowrap; cursor: pointer; }
+
+    /* Results on the left, filters on the right (like the Django admin) */
+    .layout { display: grid; grid-template-columns: minmax(0, 1fr) 16rem; gap: 1.5rem; align-items: start; }
+    .results ul { list-style: none; padding: 0; margin: 0; }
+    .results li { display: flow-root; margin: 0 0 0.75rem; padding-bottom: 0.75rem; border-bottom: 1px solid #eee; }
+    .pagination { display: flex; flex-wrap: wrap; align-items: center; gap: 0.25rem; margin-top: 1rem; }
+    .pagination.top { margin: 0 0 1rem; }
+    .pagination a, .pagination span { padding: 0.3rem 0.65rem; border: 1px solid #ccc; border-radius: 4px; text-decoration: none; color: #1a5276; background: #fff; font-size: 0.9rem; }
+    .pagination a:hover { background: #eef4f8; }
+    .pagination .current { background: #417690; border-color: #417690; color: #fff; font-weight: 600; }
+    .pagination .disabled { color: #999; background: #f6f6f6; }
+    .pagination .gap { border-color: transparent; background: transparent; color: #666; }
+
+    .filter { background: #f8f8f8; border: 1px solid #ccc; border-radius: 4px; }
+    .filter h2 { margin: 0; padding: 0.6rem 0.9rem; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid #ccc; }
+    .filter section { padding: 0.6rem 0.9rem; border-bottom: 1px solid #e5e5e5; }
+    .filter section:last-child { border-bottom: 0; }
+    .filter h3 { margin: 0 0 0.4rem; font-size: 0.85rem; color: #666; font-weight: 600; display: flex; justify-content: space-between; align-items: baseline; }
+    .clear-group { font-size: 0.75rem; font-weight: 400; padding: 0.1rem 0.5rem; cursor: pointer; }
+    .filter ul, .filter div > div { list-style: none; padding: 0; margin: 0; }
+    .filter select.auto-update { width: 100%; margin-top: 0.4rem; padding: 0.3rem; }
+    .filter label { display: block; padding: 0.15rem 0; cursor: pointer; }
+    /* Hide Select2's own "clear all" x (DAL hardcodes it on); the "Clear" links do that job.
+       The small x on each selected value stays, so one value can still be removed. */
+    .filter .select2-selection__clear { display: none; }
+    /* Keep the autocomplete boxes inside the panel (the DAL stylesheet sets min-width: 20em). */
+    .filter .select2-container { width: 100% !important; min-width: 0 !important; max-width: 100%; box-sizing: border-box; }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <h1>Product Catalog</h1>
+
+    <!-- User Login Navigation -->
+    <nav class="account" aria-label="Account">
+      {% if user.is_authenticated %}
+        <span class="who">{{ user.get_full_name|default:user.get_username }}{% if user.email %} ({{ user.email }}){% endif %}</span>
+        {% if user.is_staff %}<a href="{% url 'admin:login' %}">Admin Page</a>{% endif %}
+        <form method="post" action="{% url 'logout' %}">
+          {% csrf_token %}
+          <button type="submit">Log out</button>
+        </form>
+      {% endif %}
+      <span id="login-slot">{% include "catalog/login_link.html" %}</span>
+    </nav>
+  </header>
+
+  <!-- Django messages -->
+  {% if messages %}
+    <ul class="messages" role="status">
+      {% for message in messages %}<li class="{{ message.tags }}">{{ message }}</li>{% endfor %}
+    </ul>
+  {% endif %}
+
+  <!-- Use HTMX to trigger partial fragment refresh -->
+  <form id="filters" method="get" action="{% url 'product_search' %}"
+        hx-get="{% url 'product_search' %}"
+        hx-target="#results"
+        hx-push-url="true"
+        hx-trigger="input delay:300ms from:#id_search_query, change from:.auto-update, filters-changed">
+
+    <div class="searchbar">
+      {{ form.search_query }}
+      <label class="sort">{{ form.sort.label }} {{ form.sort }}</label>
+      <div id="clear-all-slot">{% include "catalog/clear_all_button.html" %}</div>
+    </div>
+
+    <div class="layout">
+      <div id="results" class="results">
+        {% include "catalog/search_results.html" %}
+      </div>
+
+      <aside class="filter">
+        <h2>Filter</h2>
+        <section>
+          <h3>
+            By category
+            <span id="clear-categories-slot">{% include "catalog/clear_group_button.html" with name="categories" show=has_categories %}</span>
+          </h3>
+          {{ form.categories }}
+          {{ form.category_match }}
+        </section>
+        <section>
+          <h3>
+            By tag
+            <span id="clear-tags-slot">{% include "catalog/clear_group_button.html" with name="tags" show=has_tags %}</span>
+          </h3>
+          {{ form.tags }}
+          {{ form.tag_match }}
+        </section>
+      </aside>
+    </div>
+  </form>
+
+  <!-- Trigger a full page reload on Clear All Filters form button -->
+  <form id="clear-all-form" method="get" action="{% url 'product_search' %}"></form>
+
+  <!-- Manually dispatch event on autocomplete filter change for HTMX to act on change -->
+  <script>
+    window.addEventListener("load", function () {
+      var $ = django.jQuery;
+      var form = document.getElementById("filters");
+      $("#id_categories, #id_tags").on("change", function () {
+        form.dispatchEvent(new Event("filters-changed"));
+      });
+      document.addEventListener("click", function (event) {
+        var button = event.target.closest("[data-clear]");
+        if (button) {
+          $("#id_" + button.dataset.clear).val(null).trigger("change");
+        }
+      });
+    });
+  </script>
+</body>
+</html>

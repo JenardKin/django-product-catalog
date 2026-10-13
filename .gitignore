@@ -1,0 +1,45 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Django
+*.log
+local_settings.py
+staticfiles/
+
+# Database (not committed: the sample data is loaded from seed/*.csv with the
+# seed commands, see the README)
+db.sqlite3
+db.sqlite3-journal
+
+# Secrets and local configuration
+.env
+.env.*
+!.env.example
+
+# Tool caches
+.ruff_cache/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Editors: share the team's VS Code settings, ignore everything else
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Claude Code local settings
+.claude/settings.local.json

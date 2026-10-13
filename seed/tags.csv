@@ -1,0 +1,13 @@
+name,slug,description
+UL-listed,ul-listed,Tested and listed by Underwriters Laboratories.
+Copper,copper,Copper conductor or copper material.
+Steel,steel,Made of steel.
+PVC,pvc,Polyvinyl chloride plastic.
+20A,20a,Rated for 20 amps.
+120V,120v,Rated for 120 volts.
+Outdoor-rated,outdoor-rated,Suitable for outdoor or wet locations.
+LED,led,Uses LED lighting technology.
+Consumable,consumable,Used up or replaced during normal work (e.g. fasteners and tape).
+Tool,tool,A hand or power tool.
+In stock,in-stock,Available to ship from stock.
+Prefab-ready,prefab-ready,Suitable for prefabrication before delivery to the job site.

@@ -1,0 +1,34 @@
+{% if form.errors %}
+  <p class="muted">Some filters were not valid and were ignored.</p>
+{% endif %}
+
+<p class="muted">{{ page.paginator.count }} product{{ page.paginator.count|pluralize }} found</p>
+
+{% include "catalog/pagination.html" with position="top" %}
+
+<ul>
+  {% for product in page %}
+    <li>
+      <strong>{{ product.name }}</strong> <span class="muted">{{ product.sku }}</span><br>
+      {{ product.description }}<br>
+      <span class="muted">
+        Categories: {{ product.categories.all|join:", " }}
+      </span><br>
+      <span class="muted">
+        Tags: {{ product.tags.all|join:", " }}
+      </span>
+    </li>
+  {% empty %}
+    <li>No products match these filters.</li>
+  {% endfor %}
+</ul>
+
+{% include "catalog/pagination.html" with position="bottom" %}
+
+{% if is_fragment %}
+  {# Handle out-of-band swaps for htmx partial fragments #}
+  <span id="login-slot" hx-swap-oob="true">{% include "catalog/login_link.html" %}</span>
+  <div id="clear-all-slot" hx-swap-oob="true">{% include "catalog/clear_all_button.html" %}</div>
+  <span id="clear-categories-slot" hx-swap-oob="true">{% include "catalog/clear_group_button.html" with name="categories" show=has_categories %}</span>
+  <span id="clear-tags-slot" hx-swap-oob="true">{% include "catalog/clear_group_button.html" with name="tags" show=has_tags %}</span>
+{% endif %}

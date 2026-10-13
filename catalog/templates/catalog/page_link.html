@@ -1,0 +1,5 @@
+{# Pagination link that keeps the querystring filters using HTMX. #}
+<a href="?{% if querystring %}{{ querystring }}&{% endif %}page={{ number }}"
+   hx-get="?{% if querystring %}{{ querystring }}&{% endif %}page={{ number }}"
+   hx-target="#results" hx-swap="innerHTML show:top" hx-push-url="true"
+   {% if title %}title="{{ title }}" aria-label="{{ title }}"{% endif %}>{{ label }}</a>

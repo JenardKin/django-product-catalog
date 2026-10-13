@@ -1,0 +1,8 @@
+django==5.2
+dalf==0.7.2 # used for category/tag autocomplete in product catalog form
+django-autocomplete-light==5.0.0 # used for category/tag autocomplete in product catalog form
+django-htmx==1.29.0 # used for catalog search view
+django-import-export==4.4.1 # used for admin seed data import/export
+django-model-utils==5.0.0 # used for timestamped model mixin
+python-dotenv==1.2.4 # used to read settings from the .env file
+whitenoise==6.12.0 # used to serve static files when DEBUG is off

@@ -1,0 +1,24 @@
+[tool.ruff]
+line-length = 88
+target-version = "py314"
+extend-exclude = ["*/migrations/*"] # Exclude Django migrations from linting, since they are auto-generated
+
+[tool.ruff.lint]
+select = [
+    "E", "W",   # pycodestyle errors and warnings
+    "F",        # pyflakes (unused imports, undefined names)
+    "I",        # isort (import ordering)
+    "B",        # flake8-bugbear (likely bugs)
+    "UP",       # pyupgrade (modern syntax)
+    "C4",       # flake8-comprehensions
+    "SIM",      # flake8-simplify
+    "DJ",       # flake8-django (e.g. null=True on string fields, missing __str__)
+]
+
+[tool.ruff.lint.per-file-ignores]
+"config/settings.py" = ["E501"] # Ignore line length in settings.py
+[tool.ruff.lint.isort]
+known-first-party = ["catalog", "config"] # Specify first-party app modules for import sorting
+
+[tool.ruff.format]
+quote-style = "double" # Use double quotes for strings
