@@ -102,7 +102,7 @@ linting and formatting. Neither is required: plain `venv` and `pip` will work.
 
 ```bash
 # 1. Clone the repository
-git clone <repository-url>
+git clone https://github.com/JenardKin/django-product-catalog.git
 cd django-product-catalog
 
 # 2. Create and activate a virtual environment
