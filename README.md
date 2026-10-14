@@ -42,6 +42,7 @@ catalog/
   static/catalog/js/htmx.min.js  htmx, included as a file (no build step)
   signals.py, apps.py            login and logout messages, and their registration
   management/commands/           seed_users and seed_catalog
+  tests/requirements/            tests for the requirements (python manage.py test)
 seed/                            the sample data (CSV)
 ```
 
@@ -197,6 +198,30 @@ Linting and formatting use [Ruff](https://docs.astral.sh/ruff/), configured in
 ruff check .
 ruff format .
 ```
+
+## Tests
+
+```bash
+python manage.py test
+```
+
+There is one test file per requirement in `catalog/tests/requirements/`:
+
+| File | Requirement |
+| ---- | ----------- |
+| `test_model_relationships.py` | products, categories and tags are related correctly |
+| `test_sample_data.py` | at least 5 categories, 10 tags and 20 products |
+| `test_add_data_through_the_admin.py` | data can be added with the admin forms |
+| `test_search_page.py` | the page where a user searches and filters |
+| `test_search_by_description.py` | search by description |
+| `test_filter_by_category.py` | filter by category |
+| `test_filter_by_tags.py` | filter by tags, with each match mode |
+| `test_combined_search_and_filter.py` | combine the search and the filters |
+
+`base.py` holds the shared test data (the products, categories and tags, defined as
+enums). Run only these tests with `python manage.py test catalog.tests.requirements`,
+or one file with, for example,
+`python manage.py test catalog.tests.requirements.test_filter_by_tags`.
 
 ## AI Assistance
 
